@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SurveyPulse — Update</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+<style>
+.inner { max-width: 500px; margin: 0 auto; padding: 28px 16px 48px; }
+.pg-head { margin-bottom: 20px; }
+.pg-icon { width:40px; height:40px; border-radius:11px; margin-bottom:12px; background:rgba(251,191,36,0.1); border:1px solid rgba(251,191,36,0.2); display:flex; align-items:center; justify-content:center; }
+.pg-icon svg { width:18px; height:18px; color:var(--amber); }
+.pg-title { font-family:'Syne',sans-serif; font-weight:800; font-size:22px; color:var(--text); letter-spacing:-0.5px; }
+.pg-sub   { font-size:12px; color:var(--muted); margin-top:3px; }
+.sbar { position:relative; margin-bottom:12px; }
+.sbar .iicon { color:var(--amber); opacity:0.6; }
+.sbar input { width:100%; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:9px; padding:10px 11px 10px 33px; font-size:13px; font-family:'DM Sans',sans-serif; color:var(--text); outline:none; transition:border-color 0.2s,box-shadow 0.2s; }
+.sbar input::placeholder { color:var(--muted2); }
+.sbar input:focus { border-color:rgba(251,191,36,0.4); box-shadow:0 0 0 3px rgba(251,191,36,0.08); }
+.edit-card { padding:22px 20px; margin-top:14px; }
+.edit-hdr { display:flex; align-items:center; gap:8px; margin-bottom:16px; }
+.edit-hdr svg { width:15px; height:15px; color:var(--amber); flex-shrink:0; }
+.edit-hdr h3 { font-family:'Syne',sans-serif; font-weight:700; font-size:14px; color:var(--text); }
+.edit-hdr span { color:var(--amber); }
+.row-2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:13px; }
+.row-2 .field { margin-bottom:0; }
+.btn-row { display:flex; gap:8px; margin-top:6px; }
+.empty-hint { text-align:center; padding:28px 16px; color:var(--muted); font-size:12.5px; }
+.empty-hint svg { width:32px; height:32px; opacity:0.2; display:block; margin:0 auto 10px; }
+@media(max-width:380px){ .row-2{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="orb orb-1"></div><div class="orb orb-2"></div><div class="grain"></div>
+
+<nav></nav>
+
+<div class="page">
+  <div class="inner">
+    <div class="pg-head a1">
+      <div class="pg-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+      <div class="pg-title">Update Entry</div>
+      <div class="pg-sub">Search by name or city, then edit the record.</div>
+    </div>
+
+    <div class="sbar a2">
+      <svg class="iicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="Search name, city, profession…">
+    </div>
+
+    <div id="resultsList" class="a3"></div>
+    <div id="editSection" style="display:none" class="a4"></div>
+  </div>
+</div>
+
+<script src="/static/shared.js"></script>
+<script>
+  // 1. Check login
+  if (!requireAuth()) throw '';
+  // 2. Build nav
+  renderNav('update.html');
+
+  let selId = null;
+  let searchCounter = 0;
+  let debounceTimer = null;
+
+  // Search → GET /entries?search=...  (loop through pages to get all matches)
+  async function renderResults(q) {
+    const localCounter = ++searchCounter;
+    const el = document.getElementById('resultsList');
+    el.innerHTML = '';
+    
+    if (!q.trim()) return;
+
+    try {
+      let matches = [];
+      let skip = 0;
+      const pageSize = 100;
+      
+      while (true) {
+        const data = await apiGet('/entries?search=' + encodeURIComponent(q) +
+                                  '&limit=' + pageSize + '&skip=' + skip);
+        
+        // If a newer search has started, stop this one
+        if (localCounter !== searchCounter) return;
+
+        matches.push(...data.entries);
+        if (matches.length >= data.total) break;
+        skip += pageSize;
+      }
+
+      // Final check before rendering
+      if (localCounter !== searchCounter) return;
+
+      el.innerHTML = '';
+      if (!matches.length) {
+        el.innerHTML = `<div class="empty-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>No results for "${q}"</div>`;
+        return;
+      }
+
+      // Filter out any duplicates
+      const seen = new Set();
+      const uniqueMatches = matches.filter(e => {
+        if (seen.has(e.id)) return false;
+        seen.add(e.id);
+        return true;
+      });
+
+      let html = '';
+      uniqueMatches.forEach(e => {
+        html += `<div class="result-item" style="cursor:pointer" data-id="${e.id}">
+          <div>
+            <div class="result-name">${e.name||'—'}</div>
+            <div class="result-sub">${[e.city,e.profession,e.age?'Age '+e.age:''].filter(Boolean).join(' · ')}</div>
+          </div>
+          <span class="tag tag-indigo">#${e.id}</span>
+        </div>`;
+      });
+      el.innerHTML = html;
+
+      // Add listeners
+      el.querySelectorAll('.result-item[data-id]').forEach(item => {
+        const id = item.getAttribute('data-id');
+        const entry = uniqueMatches.find(m => m.id == id);
+        item.addEventListener('click', () => loadEdit(entry));
+      });
+    } catch (err) {
+      if (localCounter === searchCounter) {
+        showToast('Search failed: ' + err.message, 'error');
+      }
+    }
+  }
+
+  document.getElementById('searchInput').addEventListener('input', e => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => renderResults(e.target.value), 300);
+  });
+
+  // Load edit form for clicked entry
+  function loadEdit(e) {
+    selId = e.id;
+    const sec = document.getElementById('editSection');
+    sec.style.display = 'block';
+    sec.innerHTML = `
+    <div class="card edit-card">
+      <div class="card-shine"></div>
+      <div class="edit-hdr">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <h3>Editing: <span>${e.name}</span></h3>
+      </div>
+      <form id="editForm" novalidate>
+        <div class="row-2">
+          <div class="field"><label>Full Name *</label><div class="input-wrap"><svg class="iicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><input type="text" id="eName" value="${e.name||''}" required></div></div>
+          <div class="field"><label>Age *</label><div class="input-wrap"><svg class="iicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg><input type="number" id="eAge" value="${e.age||''}" min="1" max="120" required></div></div>
+        </div>
+        <div class="field"><label>City *</label><div class="input-wrap ac-wrap"><svg class="iicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 2a7 7 0 0 1 7 7c0 5-7 13-7 13S5 14 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/></svg><input type="text" id="eCity" value="${e.city||''}" required autocomplete="off"><ul class="suggestions" id="eCitySug"></ul></div></div>
+        <div class="field"><label>Profession</label><div class="input-wrap ac-wrap"><svg class="iicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 4 0v2M12 12v4"/></svg><input type="text" id="eProf" value="${e.profession||''}" autocomplete="off"><ul class="suggestions" id="eProfSug"></ul></div></div>
+        <div class="field"><label>Annual Salary (₹)</label><div class="input-wrap"><svg class="iicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v1m0 10v1M9 8.5A2.5 2.5 0 0 1 12 7h.5a2 2 0 0 1 0 4h-1a2 2 0 0 0 0 4h.5A2.5 2.5 0 0 0 15 12.5"/></svg><input type="number" id="eSal" value="${e.salary||''}"></div></div>
+        <div class="btn-row">
+          <button type="submit" class="btn btn-amber" style="flex:1"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>Save Changes</button>
+          <button type="button" id="cancelBtn" class="btn btn-ghost">Cancel</button>
+        </div>
+      </form>
+    </div>`;
+
+    sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    createAutocomplete('eCity', 'eCitySug', CITIES);
+    createAutocomplete('eProf', 'eProfSug', PROFESSIONS);
+
+    // Submit → PUT /entries/{id}
+    document.getElementById('editForm').addEventListener('submit', async function(e2) {
+      e2.preventDefault();
+      const name = document.getElementById('eName').value.trim();
+      const age  = document.getElementById('eAge').value.trim();
+      const city = document.getElementById('eCity').value.trim();
+      if (!name || !age || !city) { showToast('Fill required fields', 'error'); return; }
+      try {
+        await apiPut('/entries/' + selId, {
+          name,
+          age:        parseInt(age),
+          city,
+          profession: document.getElementById('eProf').value.trim() || null,
+          salary:     document.getElementById('eSal').value.trim() ? parseInt(document.getElementById('eSal').value.trim()) : null,
+        });
+        showToast('Entry updated!', 'success');
+        sec.style.display = 'none';
+        document.getElementById('searchInput').value = '';
+        document.getElementById('resultsList').innerHTML = '';
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+      }
+    });
+    document.getElementById('cancelBtn').addEventListener('click', () => { sec.style.display = 'none'; });
+  }
+
+</script>
+</body>
+</html>

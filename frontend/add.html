@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SurveyPulse — Add Entry</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+<style>
+.add-shell {
+  min-height: calc(100vh - 52px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 28px 16px 36px;
+}
+.add-card { width: 100%; max-width: 400px; padding: 30px 28px 24px; animation: fadeUp 0.65s cubic-bezier(0.22,1,0.36,1) both; }
+.logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
+.logo-ico { width: 40px; height: 40px; background: linear-gradient(135deg,#818cf8,#22d3ee); border-radius: 11px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 14px rgba(129,140,248,0.35); flex-shrink: 0; position: relative; overflow: hidden; }
+.logo-ico::after { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,0.2),transparent); }
+.logo-ico svg { width: 18px; height: 18px; position: relative; z-index:1; }
+.logo-text { line-height: 1; }
+.logo-name { font-family:'Syne',sans-serif; font-weight:800; font-size:16px; color:var(--text); }
+.logo-sub  { font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:0.7px; margin-top:2px; }
+.form-title { font-family:'Syne',sans-serif; font-weight:700; font-size:18px; color:var(--text); margin-bottom:3px; }
+.form-sub   { font-size:12px; color:var(--muted); margin-bottom:16px; }
+.row-2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.row-2 .field { margin-bottom:0; }
+@media(max-width:380px){ .row-2{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="orb orb-1"></div><div class="orb orb-2"></div><div class="grain"></div>
+
+<nav></nav>
+
+<div class="page">
+  <div class="add-shell">
+    <div class="card add-card">
+      <div class="card-shine"></div>
+      <div class="logo-row">
+        <div class="logo-ico">
+          <svg viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="14" width="3" height="7" rx="1.2" fill="white"/>
+            <rect x="8" y="9"  width="3" height="12" rx="1.2" fill="white" opacity="0.8"/>
+            <rect x="13" y="5" width="3" height="16" rx="1.2" fill="white" opacity="0.6"/>
+            <rect x="18" y="2" width="3" height="19" rx="1.2" fill="white" opacity="0.45"/>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <div class="logo-name">SurveyPulse</div>
+          <div class="logo-sub">Data Collection</div>
+        </div>
+      </div>
+
+      <div class="form-title">Add New Entry</div>
+      <div class="form-sub">Required fields marked with *</div>
+
+      <div class="prog-wrap">
+        <div class="prog-label"><span>Completion</span><span id="pPct">0%</span></div>
+        <div class="prog-track"><div class="prog-fill" id="pFill"></div></div>
+      </div>
+
+      <form id="addForm" novalidate>
+        <div class="row-2" style="margin-bottom:13px">
+          <div class="field">
+            <label>Full Name *</label>
+            <div class="input-wrap">
+              <svg class="iicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              <input type="text" id="name" placeholder="Jane Doe" required>
+            </div>
+          </div>
+          <div class="field">
+            <label>Age *</label>
+            <div class="input-wrap">
+              <svg class="iicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg>
+              <input type="number" id="age" placeholder="28" min="1" max="120" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>City *</label>
+          <div class="input-wrap ac-wrap">
+            <svg class="iicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 2a7 7 0 0 1 7 7c0 5-7 13-7 13S5 14 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            <input type="text" id="city" placeholder="Delhi, Mumbai, London…" required autocomplete="off">
+            <ul class="suggestions" id="citySug"></ul>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Profession</label>
+          <div class="input-wrap ac-wrap">
+            <svg class="iicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 4 0v2M12 12v4"/></svg>
+            <input type="text" id="profession" placeholder="Software Engineer…" autocomplete="off">
+            <ul class="suggestions" id="profSug"></ul>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Annual Salary (₹)</label>
+          <div class="input-wrap">
+            <svg class="iicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v1m0 10v1M9 8.5A2.5 2.5 0 0 1 12 7h.5a2 2 0 0 1 0 4h-1a2 2 0 0 0 0 4h.5A2.5 2.5 0 0 0 15 12.5"/></svg>
+            <input type="number" id="salary" placeholder="750000">
+          </div>
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn btn-primary btn-full" style="margin-top:6px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          Submit Entry
+        </button>
+      </form>
+
+      <div class="lock-note">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Saved to Supabase PostgreSQL
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/static/shared.js"></script>
+<script>
+  // 1. Check login
+  if (!requireAuth()) throw '';
+  // 2. Build nav
+  renderNav('add.html');
+  // 3. Autocomplete
+  createAutocomplete('city', 'citySug', CITIES);
+  createAutocomplete('profession', 'profSug', PROFESSIONS);
+  // 4. Progress bar
+  initProgress(['name','age','city','profession','salary']);
+
+  // 5. Form submit → POST /entries
+  document.getElementById('addForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const name       = document.getElementById('name').value.trim();
+    const age        = document.getElementById('age').value.trim();
+    const city       = document.getElementById('city').value.trim();
+    const profession = document.getElementById('profession').value.trim();
+    const salary     = document.getElementById('salary').value.trim();
+
+    if (!name || !age || !city) { showToast('Fill in all required fields', 'error'); return; }
+
+    const btn = document.getElementById('submitBtn');
+    btn.textContent = 'Saving…'; btn.disabled = true;
+
+    try {
+      await apiPost('/entries', {
+        name,
+        age:        parseInt(age),
+        city,
+        profession: profession || null,
+        salary:     salary ? parseInt(salary) : null,
+      });
+      showToast('Entry added!', 'success');
+      this.reset();
+      initProgress(['name','age','city','profession','salary']);
+      setTimeout(() => location.href = 'view.html', 1400);
+    } catch (err) {
+      showToast('Error: ' + err.message, 'error');
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Submit Entry';
+      btn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

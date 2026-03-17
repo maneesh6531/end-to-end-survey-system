@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SurveyPulse — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css?v=1.2">
+<style>
+/* Page specific tweaks if any */
+</style>
+</head>
+<body>
+<div class="orb orb-1"></div><div class="orb orb-2"></div><div class="grain"></div>
+
+<div class="auth-shell">
+  <div class="card auth-card">
+    <div class="card-shine"></div>
+
+    <!-- Logo -->
+    <div class="logo-row">
+      <div class="logo-ico">
+        <svg viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="14" width="3" height="7" rx="1.2" fill="white"/>
+          <rect x="8" y="9"  width="3" height="12" rx="1.2" fill="white" opacity="0.8"/>
+          <rect x="13" y="5" width="3" height="16" rx="1.2" fill="white" opacity="0.6"/>
+          <rect x="18" y="2" width="3" height="19" rx="1.2" fill="white" opacity="0.45"/>
+        </svg>
+      </div>
+      <span class="logo-name">SurveyPulse</span>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('login')">Sign In</button>
+      <button class="tab"        onclick="switchTab('signup')">Sign Up</button>
+    </div>
+    <!-- navigation to admin login page -->
+    <div style="text-align:center;margin-bottom:16px;">
+      <a href="admin-login.html" style="font-size:13px;color:var(--accent);">Sign in as admin</a>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div class="auth-form active" id="loginForm">
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to your account</div>
+
+      <div class="field">
+        <label>Username</label>
+        <div class="input-wrap">
+          <svg class="iicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          <input type="text" id="loginUsername" placeholder="Enter username" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <div class="input-wrap">
+          <svg class="iicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="loginPassword" placeholder="Enter password" required>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-full" style="margin-top:6px" onclick="handleLogin()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+        Sign In
+      </button>
+
+      <div class="role-note">
+        <strong>Admin</strong> can add, edit and delete entries.<br>
+        <strong>User</strong> can only view entries.<br>
+        To become an admin the account role must be changed to "admin" by the
+        database owner (e.g. using an SQL client).<br>
+        <em>If you are an administrator, please use the <a href="admin-login.html">admin login page</a>.</em>
+      </div>
+    </div>
+
+    <!-- SIGNUP FORM -->
+    <div class="auth-form" id="signupForm">
+      <div class="auth-title">Create account</div>
+      <div class="auth-sub">You'll be signed in as a <strong style="color:var(--accent2)">user</strong> by default.</div>
+
+      <div class="field">
+        <label>Username</label>
+        <div class="input-wrap">
+          <svg class="iicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          <input type="text" id="signupUsername" placeholder="Choose a username" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Email</label>
+        <div class="input-wrap">
+          <svg class="iicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
+          <input type="email" id="signupEmail" placeholder="you@email.com" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <div class="input-wrap">
+          <svg class="iicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="signupPassword" placeholder="Min 6 characters" required>
+        </div>
+      </div>
+
+      <button class="btn btn-success btn-full" style="margin-top:6px" onclick="handleSignup()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+        Create Account
+      </button>
+    </div>
+
+  </div>
+</div>
+<script src="/static/shared.js"></script>
+<script>
+async function handleLogin() {
+  const u = document.getElementById('loginUsername').value;
+  const p = document.getElementById('loginPassword').value;
+  await doLogin(u, p, false);
+}
+
+async function handleSignup() {
+  const u = document.getElementById('signupUsername').value;
+  const e = document.getElementById('signupEmail').value;
+  const p = document.getElementById('signupPassword').value;
+  const ok = await doSignup(u, e, p);
+  if (ok) switchTab('login');
+}
+
+function switchTab(tab) {
+  document.getElementById('loginForm').classList.toggle('active', tab === 'login');
+  document.getElementById('signupForm').classList.toggle('active', tab === 'signup');
+  const tabs = document.querySelectorAll('.tab');
+  tabs[0].classList.toggle('active', tab === 'login');
+  tabs[1].classList.toggle('active', tab === 'signup');
+}
+
+// Redirect if already logged in
+if (getToken()) location.href = 'index.html';
+</script>
+</body>
+</html>

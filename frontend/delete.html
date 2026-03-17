@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SurveyPulse — Delete</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+<style>
+.inner { max-width:500px; margin:0 auto; padding:28px 16px 48px; }
+.pg-head { margin-bottom:20px; }
+.pg-icon { width:40px; height:40px; border-radius:11px; margin-bottom:12px; background:rgba(248,113,113,0.1); border:1px solid rgba(248,113,113,0.2); display:flex; align-items:center; justify-content:center; }
+.pg-icon svg { width:18px; height:18px; color:var(--red); }
+.pg-title { font-family:'Syne',sans-serif; font-weight:800; font-size:22px; color:var(--text); letter-spacing:-0.5px; }
+.pg-sub   { font-size:12px; color:var(--muted); margin-top:3px; }
+.sbar { position:relative; margin-bottom:12px; }
+.sbar .iicon { color:var(--red); opacity:0.55; }
+.sbar input { width:100%; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:9px; padding:10px 11px 10px 33px; font-size:13px; font-family:'DM Sans',sans-serif; color:var(--text); outline:none; transition:border-color 0.2s,box-shadow 0.2s; }
+.sbar input::placeholder { color:var(--muted2); }
+.sbar input:focus { border-color:rgba(248,113,113,0.4); box-shadow:0 0 0 3px rgba(248,113,113,0.08); }
+.result-item:hover { border-color:rgba(248,113,113,0.25); background:rgba(248,113,113,0.04); }
+.empty-hint { text-align:center; padding:28px 16px; color:var(--muted); font-size:12.5px; }
+.empty-hint svg { width:32px; height:32px; opacity:0.2; display:block; margin:0 auto 10px; }
+.overlay { position:fixed; inset:0; z-index:500; background:rgba(0,0,0,0.65); backdrop-filter:blur(5px); display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity 0.25s; }
+.overlay.open { opacity:1; pointer-events:auto; }
+.modal { background:#0b0d16; border:1px solid rgba(248,113,113,0.25); border-radius:16px; padding:28px 24px; max-width:340px; width:100%; box-shadow:0 24px 60px rgba(0,0,0,0.6); transform:scale(0.95); transition:transform 0.25s; }
+.overlay.open .modal { transform:scale(1); }
+.modal-icon { width:48px; height:48px; border-radius:13px; margin:0 auto 14px; background:rgba(248,113,113,0.1); border:1px solid rgba(248,113,113,0.25); display:flex; align-items:center; justify-content:center; }
+.modal-icon svg { width:22px; height:22px; color:var(--red); }
+.modal-title { font-family:'Syne',sans-serif; font-weight:800; font-size:17px; color:var(--text); text-align:center; margin-bottom:6px; }
+.modal-desc  { font-size:12px; color:var(--muted); text-align:center; line-height:1.6; margin-bottom:16px; }
+.modal-entry { background:rgba(248,113,113,0.06); border:1px solid rgba(248,113,113,0.18); border-radius:9px; padding:10px 14px; margin-bottom:16px; }
+.modal-entry-name { font-size:13px; font-weight:600; color:var(--text); }
+.modal-entry-sub  { font-size:11px; color:var(--muted); margin-top:2px; }
+.modal-btns { display:flex; gap:8px; }
+</style>
+</head>
+<body>
+<div class="orb orb-1"></div><div class="orb orb-2"></div><div class="grain"></div>
+
+<nav></nav>
+
+<div class="page">
+  <div class="inner">
+    <div class="pg-head a1">
+      <div class="pg-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></div>
+      <div class="pg-title">Delete Entry</div>
+      <div class="pg-sub">Search and permanently remove a record.</div>
+    </div>
+    <div class="sbar a2">
+      <svg class="iicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="Search name, city, profession…">
+    </div>
+    <div id="resultsListDelete" class="a3"></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+    <div class="modal-title">Confirm Delete</div>
+    <div class="modal-desc">This cannot be undone. This record will be permanently removed:</div>
+    <div class="modal-entry">
+      <div class="modal-entry-name" id="mName">—</div>
+      <div class="modal-entry-sub"  id="mSub">—</div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-danger" style="flex:1" id="confirmBtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>Delete</button>
+      <button class="btn btn-ghost" id="cancelBtn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/shared.js"></script>
+<script>
+  // 1. Check login
+  if (!requireAuth()) throw '';
+  // 2. Build nav
+  renderNav('delete.html');
+
+  let pendId = null;
+  let lastQuery = '';
+  let searchCounter = 0;
+  let debounceTimer = null;
+
+  // Search → GET /entries?search=...  (fetch all pages of results)
+  async function renderDeleteResults(q) {
+    const localCounter = ++searchCounter;
+    lastQuery = q;
+    const el = document.getElementById('resultsListDelete');
+    el.innerHTML = '';
+    
+    if (!q.trim()) return;
+
+    try {
+      let hits = [];
+      let skip = 0;
+      const pageSize = 100;
+      
+      while (true) {
+        const data = await apiGet('/entries?search=' + encodeURIComponent(q) +
+                                  '&limit=' + pageSize + '&skip=' + skip);
+        
+        if (localCounter !== searchCounter) return;
+
+        hits.push(...data.entries);
+        if (hits.length >= data.total) break;
+        skip += pageSize;
+      }
+
+      if (localCounter !== searchCounter) return;
+
+      el.innerHTML = '';
+      if (!hits.length) {
+        el.innerHTML = `<div class="empty-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>No results for "${q}"</div>`;
+        return;
+      }
+
+      // Filter out any duplicates just in case
+      const seen = new Set();
+      const uniqueHits = hits.filter(e => {
+        const key = `${e.id}-${e.name}-${e.city}-${e.profession}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+
+      let html = '';
+      uniqueHits.forEach(e => {
+        html += `<div class="result-item">
+          <div>
+            <div class="result-name">${e.name||'—'}</div>
+            <div class="result-sub">${[e.city,e.profession,e.age?'Age '+e.age:''].filter(Boolean).join(' · ')}</div>
+          </div>
+          <button class="btn btn-danger btn-sm" style="flex-shrink:0" data-id="${e.id}">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>Delete
+          </button>
+        </div>`;
+      });
+      el.innerHTML = html;
+
+      // Add listeners after setting HTML
+      el.querySelectorAll('button[data-id]').forEach(btn => {
+        const id = btn.getAttribute('data-id');
+        const entry = uniqueHits.find(h => h.id == id);
+        btn.addEventListener('click', () => openModal(entry));
+      });
+    } catch (err) {
+      if (localCounter === searchCounter) {
+        showToast('Search failed: ' + err.message, 'error');
+      }
+    }
+  }
+
+  document.getElementById('searchInput').addEventListener('input', e => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => renderDeleteResults(e.target.value), 300);
+  });
+
+  function openModal(e) {
+    pendId = e.id;
+    document.getElementById('mName').textContent = e.name;
+    document.getElementById('mSub').textContent  = [e.city, e.profession, e.age?'Age '+e.age:''].filter(Boolean).join(' · ');
+    document.getElementById('overlay').classList.add('open');
+  }
+  function closeModal() { pendId = null; document.getElementById('overlay').classList.remove('open'); }
+
+  // Confirm → DELETE /entries/{id}
+  document.getElementById('confirmBtn').addEventListener('click', async () => {
+    if (!pendId) return;
+    try {
+      await apiDelete('/entries/' + pendId);
+      showToast('Entry deleted', 'success');
+      closeModal();
+      renderDeleteResults(lastQuery);  // refresh results
+    } catch (err) {
+      showToast('Error: ' + err.message, 'error');
+      closeModal();
+    }
+  });
+
+  document.getElementById('cancelBtn').addEventListener('click', closeModal);
+  document.getElementById('overlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+</script>
+</body>
+</html>

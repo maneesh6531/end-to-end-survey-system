@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SurveyPulse — Home</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css?v=1.2">
+<style>
+.home-wrap {
+  min-height: calc(100vh - 52px);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 32px 20px 40px; text-align: center;
+}
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px; border-radius: 99px; margin-bottom: 20px;
+  background: rgba(129,140,248,0.09); border: 1px solid rgba(129,140,248,0.22);
+  font-size: 11px; font-weight: 600; color: var(--accent); letter-spacing: 0.7px; text-transform: uppercase;
+}
+.badge-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: blink 2s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.hero-title {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: clamp(30px, 5.5vw, 58px); line-height: 1.08;
+  letter-spacing: -1.5px; color: var(--text); margin-bottom: 12px;
+}
+.hero-title span {
+  background: linear-gradient(135deg, #818cf8 20%, #22d3ee 80%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-desc { font-size: 14px; color: var(--muted); line-height: 1.65; max-width: 400px; margin-bottom: 28px; }
+.stats { display: flex; gap: 24px; justify-content: center; margin-bottom: 32px; flex-wrap: wrap; }
+.stat-item { text-align: center; }
+.stat-n { font-family: 'Syne',sans-serif; font-weight: 800; font-size: 24px;
+  background: linear-gradient(135deg,#818cf8,#22d3ee); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.stat-l { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; margin-top: 2px; }
+.stat-divider { width: 1px; background: var(--border); height: 36px; align-self: center; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 580px; width: 100%; }
+.action-card {
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px 18px 18px; text-decoration: none;
+  text-align: left; display: block; cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  position: relative; overflow: hidden;
+}
+.action-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg,transparent,rgba(255,255,255,0.07),transparent); }
+.action-card:hover { transform: translateY(-3px); }
+.action-card.c-add:hover    { border-color: rgba(129,140,248,0.35); box-shadow: 0 10px 30px rgba(129,140,248,0.12); }
+.action-card.c-update:hover { border-color: rgba(251,191,36,0.35);  box-shadow: 0 10px 30px rgba(251,191,36,0.10); }
+.action-card.c-delete:hover { border-color: rgba(248,113,113,0.35); box-shadow: 0 10px 30px rgba(248,113,113,0.10); }
+.action-card.c-view:hover   { border-color: rgba(34,211,238,0.35);  box-shadow: 0 10px 30px rgba(34,211,238,0.10); }
+.card-ico { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+.card-ico svg { width: 17px; height: 17px; }
+.c-add    .card-ico { background: rgba(129,140,248,0.12); color: var(--accent); }
+.c-update .card-ico { background: rgba(251,191,36,0.10);  color: var(--amber); }
+.c-delete .card-ico { background: rgba(248,113,113,0.10); color: var(--red); }
+.c-view   .card-ico { background: rgba(34,211,238,0.10);  color: var(--accent2); }
+.card-title { font-family:'Syne',sans-serif; font-weight:700; font-size:14px; color:var(--text); margin-bottom:4px; }
+.card-desc  { font-size:12px; color:var(--muted); line-height:1.5; }
+.card-arrow { position: absolute; top: 16px; right: 16px; width: 22px; height: 22px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; transition: transform 0.15s; }
+.action-card:hover .card-arrow { transform: translate(1px,-1px); }
+.card-arrow svg { width: 11px; height: 11px; color: var(--muted); }
+.c-view { grid-column: span 2; }
+@media(max-width:480px){ .grid { grid-template-columns:1fr; } .c-view { grid-column: span 1; } }
+</style>
+</head>
+<body>
+<div class="orb orb-1"></div><div class="orb orb-2"></div><div class="grain"></div>
+
+<!-- nav is empty — renderNav() fills it in from shared.js -->
+<nav></nav>
+
+<div class="page">
+  <div class="home-wrap">
+
+    <div class="badge a1"><div class="badge-dot"></div>Survey Data System</div>
+    <h1 class="hero-title a2">Collect &amp; Manage<br><span>Survey Data</span></h1>
+    <p class="hero-desc a3">Add, update, delete and explore entries — stored in Supabase PostgreSQL.</p>
+
+    <div class="stats a4">
+      <div class="stat-item"><div class="stat-n" id="sTotal">—</div><div class="stat-l">Total</div></div>
+      <div class="stat-divider"></div>
+      <div class="stat-item"><div class="stat-n" id="sCities">—</div><div class="stat-l">Cities</div></div>
+      <div class="stat-divider"></div>
+      <div class="stat-item"><div class="stat-n" id="sToday">—</div><div class="stat-l">Today</div></div>
+    </div>
+
+    <div class="grid a5" id="actionGrid">
+      <!-- Cards injected by JS based on role -->
+    </div>
+
+  </div>
+</div>
+
+<script src="/static/shared.js"></script>
+<script>
+  // 1. Check login — if no token, goes to login.html
+  if (!requireAuth()) throw '';
+
+  // 2. Build nav with correct links for this user's role
+  renderNav('index.html');
+
+  // 3. Build action cards — admins see all 4, users only see View All
+  const isAdmin = getRole() === 'admin';
+  const grid = document.getElementById('actionGrid');
+  grid.innerHTML = `
+    ${isAdmin ? `
+    <a class="action-card c-add" href="add.html">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg></div>
+      <div class="card-title">Add New Entry</div>
+      <div class="card-desc">Submit a new survey response.</div>
+      <div class="card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M7 17L17 7M7 7h10v10"/></svg></div>
+    </a>
+    <a class="action-card c-update" href="update.html">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+      <div class="card-title">Update Entry</div>
+      <div class="card-desc">Edit any existing record.</div>
+      <div class="card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M7 17L17 7M7 7h10v10"/></svg></div>
+    </a>
+    <a class="action-card c-delete" href="delete.html">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></div>
+      <div class="card-title">Delete Entry</div>
+      <div class="card-desc">Remove a record permanently.</div>
+      <div class="card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M7 17L17 7M7 7h10v10"/></svg></div>
+    </a>` : ''}
+    <a class="action-card c-view ${isAdmin ? '' : ''}" href="view.html" style="${isAdmin ? 'grid-column:span 2' : 'max-width:380px;margin:0 auto;width:100%'}">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+      <div class="card-title">View All Entries</div>
+      <div class="card-desc">Browse, search and filter every submitted record.</div>
+      <div class="card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M7 17L17 7M7 7h10v10"/></svg></div>
+    </a>
+  `;
+
+  // 4. Fetch live stats from FastAPI backend
+  apiGet('/stats')
+    .then(s => {
+      document.getElementById('sTotal').textContent  = s.total;
+      document.getElementById('sCities').textContent = s.cities;
+      document.getElementById('sToday').textContent  = s.today;
+    })
+    .catch(() => {
+      ['sTotal','sCities','sToday'].forEach(id => document.getElementById(id).textContent = '—');
+    });
+</script>
+</body>
+</html>
