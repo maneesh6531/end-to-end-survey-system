@@ -1,9 +1,18 @@
-# Ignore virtual environment
+# Virtual environments
 venv/
+.venv/
 
-# Ignore environment variables
+# Environment variables
 .env
+*.env
 
 # Python cache
 __pycache__/
 *.pyc
+
+# Airflow logs
+data_pipeline/logs/
+
+# OS files
+.DS_Store
+Thumbs.db
