@@ -18,17 +18,7 @@ This project demonstrates a modern data engineering workflow:
 ---
 
 ## 🏗️ Architecture
-Frontend (HTML/CSS/JS + FastAPI)
-↓
-Supabase (PostgreSQL)
-↓
-Apache Airflow (ETL Pipeline)
-↓
-Amazon S3 (Raw + Processed Data)
-↓
-Amazon Athena (SQL Queries)
-↓
-Power BI (Dashboard)
+Frontend (HTML/CSS/JS + FastAPI) -> Supabase (PostgreSQL) -> Apache Airflow (ETL Pipeline) → Amazon S3 (Raw + Processed Data) -> Amazon Athena (SQL Queries) -> Power BI (Dashboard)
 
 
 ---
