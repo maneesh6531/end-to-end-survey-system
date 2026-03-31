@@ -58,19 +58,6 @@ Power BI (Dashboard)
 
 ---
 
-## 📂 Project Structure
-data_pipeline/
-│
-├── dags/ # Airflow DAG definitions
-├── scripts/ # ETL scripts
-├── docker-compose.yaml # Airflow setup
-├── requirements.txt
-├── .env # Environment variables (not committed)
-└── README.md
-
-
----
-
 ## 🔄 Pipeline Workflow
 
 1. **Extract**
